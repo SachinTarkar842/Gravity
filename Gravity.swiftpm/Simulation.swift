@@ -1,0 +1,542 @@
+//
+//  File.swift
+//  Gravity
+//
+//  Created by IOS on 16/02/25.
+//
+
+import SwiftUI
+import SceneKit
+import Foundation
+import Combine
+
+
+struct Simulation: View {
+    
+    @State var solarscene = SolarScene(
+        focusOnBody: false,
+        focusIndex: 0,
+        trails: false,
+        velocityArrows: false,
+        gravitationalConstant: 1,
+        inputBodies: [],
+        allowCameraControl: true,
+        showTexture: true
+    )
+    
+    @State private var sideButtonsX: CGFloat = 100
+    @State private var sideButtonsOpacity: CGFloat = 0
+    @State private var sideButtonsExpanded: Bool = false
+    @State private var isEditPresented: Bool = false
+    @State private var isAddPresented: Bool = false
+    @State private var isSettingsPresented: Bool = false
+    @State private var isDeletePresented: Bool = false
+    @State private var isHelpActive: Bool = false
+    @State private var isAvailable: Bool = false
+    @State var showSheet: Bool = false
+    
+    @State private var selectedBody: String = ""
+    @State private var selectedBodyName: String = ""
+    @State private var selectedBodyMass: String = ""
+    @State private var selectedBodyColour: Color = .accentColor
+    
+    @State private var selectedBodyVelocityX: String = ""
+    @State private var selectedBodyVelocityY: String = ""
+    @State private var selectedBodyVelocityZ: String = ""
+    
+    @State private var selectedBodyPositionX: String = ""
+    @State private var selectedBodyPositionY: String = ""
+    @State private var selectedBodyPositionZ: String = ""
+    
+    @State private var massRangeLower: String = "1.00"
+    @State private var massRangeUpper: String = "20.00"
+    @State private var positionRangeLower: String = "-70.00"
+    @State private var positionRangeUpper: String = "70.00"
+    @State private var velocityRangeLower: String = "-0.80"
+    @State private var velocityRangeUpper: String = "0.80"
+    @State private var bodynumRangeLower: String = "3"
+    @State private var bodynumRangeUpper: String = "9"
+    
+    
+    
+    @State private var availableBodies: [String] = []
+    @State private var focusOnBody: Bool = false
+    @State private var showTrails: Bool = false
+    @State private var showVelocityArrows: Bool = false
+    @State private var gravitationalConstant: CGFloat = 1
+    @State private var playing: Bool = false
+    @State private var allBodies = ["Sun", "Mercury", "Venus", "Earth", "Moon", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+    
+    
+    var startingFocusOnBody: Bool
+    var startingShowTrails: Bool
+    var startingShowVelocityArrows: Bool
+    var startingGravitationalConstant: CGFloat
+    var startingFocusIndex: Int
+    var startingBodies: [BodyDefiner]
+    var showUI: Bool
+    var allowCameraControl: Bool
+    var showTexture: Bool = true
+    var cameraTransform: SCNVector3 = SCNVector3(0, 0, 0)
+    
+    var notAvailableBodies: [String] {
+            allBodies.filter { !availableBodies.contains($0) }
+        }
+        
+
+    
+    init(startingFocusOnBody: Bool, startingShowTrails: Bool, startingShowVelocityArrows: Bool, startingGravitationalConstant: CGFloat, startingFocusIndex: Int, startingBodies: [BodyDefiner], showUI: Bool, allowCameraControl: Bool, cameraTransform: SCNVector3 = SCNVector3(0, 0, 0), showTexture: Bool = true) {
+        self.startingFocusOnBody = startingFocusOnBody
+        self.startingShowTrails = startingShowTrails
+        self.startingShowVelocityArrows = startingShowVelocityArrows
+        self.startingGravitationalConstant = startingGravitationalConstant
+        self.startingFocusIndex = startingFocusIndex
+        self.startingBodies = startingBodies
+        self.showUI = showUI
+        self.allowCameraControl = allowCameraControl
+        self.cameraTransform = cameraTransform
+        self.showTexture = showTexture
+        
+        solarscene.focusOnBody = startingFocusOnBody
+        solarscene.focusIndex = startingFocusIndex
+        solarscene.trails = startingShowTrails
+        solarscene.velocityArrows = startingShowVelocityArrows
+        solarscene.gravitationalConstant = gravitationalConstant
+        solarscene.inputBodies = startingBodies
+        solarscene.loadNewBodies()
+    }
+    
+    var body: some View {
+        if showUI {
+            VStack {
+                
+                SceneView(
+                    scene: solarscene.scene,
+                    pointOfView: solarscene.camera,
+                    options: solarscene.viewOptions
+                )
+                
+                // help button
+                .floatingActionButton(color: .clear, image: Image(systemName: "questionmark.circle").foregroundColor(.white), align: ButtonAlign.right, customY: -20, customX: 15, top: true) {
+                    isHelpActive.toggle()
+                }.sheet(isPresented: $isHelpActive) {
+                           HelpView()
+                       }
+                
+                // delete all button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "trash").foregroundColor(.white), align: ButtonAlign.right) {
+                    isDeletePresented.toggle()
+                }
+                
+                
+                
+                // play and pause button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: playing ? "pause.fill" : "play.fill").foregroundColor(.white), align: ButtonAlign.centre) {
+                    if solarscene.bodies.count > 0 {
+                        if solarscene.counter == 0 {
+                            solarscene.startLoop()
+                        } else {
+                            solarscene.pauseLoop()
+                        }
+                    }
+                    playing.toggle()
+                }
+                
+                // settings button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "gear").foregroundColor(.white), align: ButtonAlign.centre, customX: -80) {
+                    availableBodies = solarscene.bodies.map({ (body) in
+                        return body.internalName
+                    })
+                    
+                    if availableBodies.count > 0 {
+                        selectedBody = availableBodies[solarscene.focusIndex]
+                    }
+                    focusOnBody = solarscene.focusOnBody
+                    showTrails = solarscene.trails
+                    showVelocityArrows = solarscene.velocityArrows
+                    gravitationalConstant = solarscene.gravitationalConstant
+                    
+                    isSettingsPresented.toggle()
+                }
+                
+                
+                // edit button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "pencil").foregroundColor(.white), align: ButtonAlign.centre, customX: 80) {
+                    
+                    availableBodies = solarscene.bodies.map({ (body) in
+                        
+                        return body.internalName
+                    })
+                    print(notAvailableBodies)
+                    if availableBodies.count > 0 {
+                        selectedBody = availableBodies[0]
+                        selectedBodyName = selectedBody
+                        selectedBodyMass = String(format: "%.2f", solarscene.bodies[0].mass)
+                        selectedBodyColour = Color(solarscene.bodies[0].color)
+                        
+                        selectedBodyVelocityX = String(format: "%.2f", solarscene.bodies[0].initialVelocity.x)
+                        selectedBodyVelocityY = String(format: "%.2f", solarscene.bodies[0].initialVelocity.y)
+                        selectedBodyVelocityZ = String(format: "%.2f", solarscene.bodies[0].initialVelocity.z)
+                        
+                        selectedBodyPositionX = String(format: "%.2f", solarscene.bodies[0].initialPosition.x)
+                        selectedBodyPositionY = String(format: "%.2f", solarscene.bodies[0].initialPosition.y)
+                        selectedBodyPositionZ = String(format: "%.2f", solarscene.bodies[0].initialPosition.z)
+                    }
+                    
+                    isEditPresented.toggle()
+                }
+                
+                // Edit Button Slideover
+                .slideOverCard(isPresented: $isEditPresented) {
+
+                    Button("plus") {
+                        showSheet = true
+                    }
+                    .padding()
+                    
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                .padding()
+                // Present the sheet with a List of not-available bodies.
+                .sheet(isPresented: $showSheet) {
+                    NavigationView {
+                        List(notAvailableBodies, id: \.self) { bodyName in
+                            Button(action: {
+                                // When a body is selected, update the text field and dismiss the sheet.
+                                selectedBody = bodyName
+                                showSheet = false
+                            }) {
+                                Text(bodyName)
+                            }
+                        }.onAppear {
+                            if selectedBody == "Mercury" {
+                                selectedBodyName = "Mercury"
+                                selectedBodyMass = "1"
+                                selectedBodyColour = Color.random
+                                selectedBodyVelocityX = "0"
+                                selectedBodyVelocityY = "1"
+                                selectedBodyVelocityZ = "0"
+                                selectedBodyPositionX = "1"
+                                selectedBodyPositionY = "0"
+                                selectedBodyPositionZ = "0"
+                            }
+                        }
+                        .navigationTitle("Select Body")
+                        .navigationBarItems(trailing: Button("Cancel") {
+                            showSheet = false
+                        }
+                        )
+                    }
+                }
+                    VStack {
+                        
+                      
+                        Group {
+                            Text("Edit Bodies:")
+                                .fontWeight(.bold)
+                                .font(.title)
+                            
+                            Text("Please choose a body")
+                                .font(.subheadline)
+                                .padding(.top)
+                            
+                            Picker("Please choose a body", selection: $selectedBody) {
+                                ForEach(availableBodies + ["New..."], id: \.self) {
+                                    Text($0)
+                                }
+                            }
+                            .onChange(of: selectedBody) { newValue in
+                                if newValue == "New..." {
+                                    selectedBodyName = planetNames.randomElement() ?? "random planet name"
+                                    selectedBodyMass = String(format: "%.2f", CGFloat.random(in: 1.00...20.00))
+                                    selectedBodyColour = Color.random
+                                    
+                                    selectedBodyVelocityX = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                    selectedBodyVelocityY = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                    selectedBodyVelocityZ = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                    
+                                    selectedBodyPositionX = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                    selectedBodyPositionY = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                    selectedBodyPositionZ = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                } else {
+                                    let index = availableBodies.firstIndex(of: selectedBody) ?? 0
+                                    selectedBodyName = newValue
+                                    selectedBodyMass = String(format: "%.2f", solarscene.bodies[index].mass)
+                                    selectedBodyColour = Color(solarscene.bodies[index].color)
+                                    
+                                    selectedBodyVelocityX = String(format: "%.2f", solarscene.bodies[index].initialVelocity.x)
+                                    selectedBodyVelocityY = String(format: "%.2f", solarscene.bodies[index].initialVelocity.y)
+                                    selectedBodyVelocityZ = String(format: "%.2f", solarscene.bodies[index].initialVelocity.z)
+                                    
+                                    selectedBodyPositionX = String(format: "%.2f", solarscene.bodies[index].initialPosition.x)
+                                    selectedBodyPositionY = String(format: "%.2f", solarscene.bodies[index].initialPosition.y)
+                                    selectedBodyPositionZ = String(format: "%.2f", solarscene.bodies[index].initialPosition.z)
+                                }
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        Group {
+                            HStack {
+                                Text("Name:")
+                                
+                                TextField(selectedBodyName, text: $selectedBodyName)
+                                    .textFieldStyle(.roundedBorder)
+                                    .multilineTextAlignment(.center)
+                            }
+                            
+                            
+                            HStack {
+                                Text("Mass:")
+                                UIUnsignedInput(label: nil, binding: $selectedBodyMass, inputText: selectedBodyMass)
+                            }
+                            
+                            ColorPicker("Body Colour:", selection: $selectedBodyColour, supportsOpacity: false)
+                        }
+                        
+                        Group {
+                            
+                            Spacer()
+                                .frame(height: 20)
+                            
+                            HStack {
+                                Text("Velocity:")
+                                UISignedInput(label: "X", binding: $selectedBodyVelocityX, inputText: selectedBodyVelocityX)
+                                UISignedInput(label: "Y", binding: $selectedBodyVelocityY, inputText: selectedBodyVelocityY)
+                                UISignedInput(label: "Z", binding: $selectedBodyVelocityZ, inputText: selectedBodyVelocityZ)
+                            }
+                            
+                            Spacer()
+                                .frame(height: 20)
+                            
+                            HStack {
+                                Text("Position:")
+                                UISignedInput(label: "X", binding: $selectedBodyPositionX, inputText: selectedBodyPositionX)
+                                UISignedInput(label: "Y", binding: $selectedBodyPositionY, inputText: selectedBodyPositionY)
+                                UISignedInput(label: "Z", binding: $selectedBodyPositionZ, inputText: selectedBodyPositionZ)
+                            }
+                            
+                            Divider()
+                            
+                            Spacer()
+                                .frame(height: 20)
+                        }
+                        //Delete Button
+                        
+                        HStack {
+                            Button("Delete", action: {
+                                if selectedBody != "New..." {
+                                    if solarscene.focusIndex == solarscene.bodies.count - 1 {
+                                        solarscene.focusIndex -= 1
+                                    }
+                                    
+                                    solarscene.scene.rootNode.childNode(withName: solarscene.bodies[availableBodies.firstIndex(of: selectedBody) ?? 0].planetBody?.name ?? "planet", recursively: false)?.removeFromParentNode()
+                                    solarscene.bodies.remove(at: availableBodies.firstIndex(of: selectedBody) ?? 0)
+                                    
+                                    availableBodies.removeAll { (body) in
+                                        body == selectedBody
+                                    }
+                                    if availableBodies.count > 0 {
+                                        selectedBody = availableBodies[0]
+                                    } else {
+                                        selectedBody = "New..."
+                                        
+                                        selectedBodyName = planetNames.randomElement() ?? "random planet name"
+                                        selectedBodyMass = String(format: "%.2f", CGFloat.random(in: 1.00...20.00))
+                                        selectedBodyColour = Color.random
+                                        
+                                        selectedBodyVelocityX = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                        selectedBodyVelocityY = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                        selectedBodyVelocityZ = String(format: "%.2f", CGFloat.random(in: -0.80...0.80))
+                                        
+                                        selectedBodyPositionX = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                        selectedBodyPositionY = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                        selectedBodyPositionZ = String(format: "%.2f", CGFloat.random(in: -40.00...40.00))
+                                    }
+                                }
+                                
+                                isEditPresented = false
+                            })
+                            .padding(.trailing)
+                            
+                            Divider()
+                                .frame(height: 20)
+                            
+                            Button("Confirm", action: {
+                                print(selectedBody)
+                                if selectedBody != "New..." {
+                                    solarscene.inputBodies[availableBodies.firstIndex(of: selectedBody) ?? 0].name = selectedBodyName
+                                    solarscene.inputBodies[availableBodies.firstIndex(of: selectedBody) ?? 0].mass = CGFloat(Double(selectedBodyMass) ?? 1)
+                                    solarscene.inputBodies[availableBodies.firstIndex(of: selectedBody) ?? 0].velocity = SCNVector3(x: Float(selectedBodyVelocityX) ?? 1, y: Float(selectedBodyVelocityY) ?? 1, z: Float(selectedBodyVelocityZ) ?? 1)
+                                    solarscene.inputBodies[availableBodies.firstIndex(of: selectedBody) ?? 0].position = SCNVector3(x: Float(selectedBodyPositionX) ?? 1, y: Float(selectedBodyPositionY) ?? 1, z: Float(selectedBodyPositionZ) ?? 1)
+                                    solarscene.inputBodies[availableBodies.firstIndex(of: selectedBody) ?? 0].color = UIColor(selectedBodyColour)
+                                } else {
+                                    solarscene.inputBodies.append(BodyDefiner(name: selectedBodyName, mass: CGFloat(Double(selectedBodyMass) ?? 1), velocity: SCNVector3(x: Float(selectedBodyVelocityX) ?? 1, y: Float(selectedBodyVelocityY) ?? 1, z: Float(selectedBodyVelocityZ) ?? 1), position: SCNVector3(x: Float(selectedBodyPositionX) ?? 1, y: Float(selectedBodyPositionY) ?? 1, z: Float(selectedBodyPositionZ) ?? 1), color: UIColor(selectedBodyColour)))
+                                }
+                                
+                                solarscene.pauseLoop()
+                                solarscene = SolarScene(
+                                    focusOnBody: solarscene.focusOnBody, focusIndex: solarscene.focusIndex, trails: solarscene.trails, velocityArrows: solarscene.velocityArrows, gravitationalConstant: solarscene.gravitationalConstant, inputBodies: solarscene.inputBodies, allowCameraControl: true
+                                )
+                                
+                                playing = false
+                                
+                                isEditPresented = false
+                            })
+                            .padding(.leading)
+                        }
+                        .padding(.bottom)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
+                
+                // Settings Button Slideover
+                .slideOverCard(isPresented: $isSettingsPresented) {
+                    VStack {
+                        Text("Settings:")
+                            .fontWeight(.bold)
+                            .font(.title)
+                            .padding(.bottom)
+                        
+                        if availableBodies.count > 0 {
+                            Toggle(isOn: $focusOnBody) {
+                                Label("Focus On Body", systemImage: "scope")
+                            }
+                            .onChange(of: focusOnBody) { value in
+                                solarscene.focusOnBody = focusOnBody
+                            }
+                            .toggleStyle(.button)
+                            
+                            Text("Please choose a body")
+                                .font(.subheadline)
+                                .padding(.top)
+                            
+                            Picker("Please choose a body", selection: $selectedBody) {
+                                ForEach(availableBodies, id: \.self) {
+                                    Text($0)
+                                }
+                            }
+                            .disabled(!focusOnBody)
+                            
+                            Text("You selected \"\(selectedBody)\", which has a mass of \(String(format: "%.2f", solarscene.bodies[availableBodies.firstIndex(of: selectedBody) ?? 0].mass)) and a colour of \(solarscene.bodies[availableBodies.firstIndex(of: selectedBody) ?? 0].color.accessibilityName)")
+                                .padding(10)
+                                .multilineTextAlignment(.center)
+                            
+                            Divider()
+                                .padding(.bottom)
+                            
+                            HStack {
+                                Toggle(isOn: $showTrails) {
+                                    Label("Show Trails", systemImage: "moon.stars")
+                                }
+                                .onChange(of: showTrails) { value in
+                                    if value {
+                                        solarscene.showTrails()
+                                    } else {
+                                        solarscene.hideTrails()
+                                    }
+                                }
+                                .toggleStyle(.button)
+                                .padding(.bottom)
+                                
+                                Spacer()
+                                    .frame(width: 20)
+                                
+                                Toggle(isOn: $showVelocityArrows) {
+                                    Label("Show Velocity", systemImage: "arrow.up.right")
+                                }
+                                .toggleStyle(.button)
+                                .padding(.bottom)
+                            }
+                            
+                            Divider()
+                                .padding(.top)
+                            
+                            HStack {
+                                Text("Gravitational Constant:")
+                                    .multilineTextAlignment(.center)
+                                
+                                let formatter: NumberFormatter = {
+                                    let formatter = NumberFormatter()
+                                    formatter.numberStyle = .decimal
+                                    return formatter
+                                }()
+                                
+                                TextField("Enter a Gravitational Constant", value: $gravitationalConstant, formatter: formatter)
+                                    .textFieldStyle(.roundedBorder)
+                                    .keyboardType(.decimalPad)
+                                    .padding()
+                                    .multilineTextAlignment(.center)
+                            }
+                            
+                            Divider()
+                                .padding(.bottom)
+                            
+                        } else {
+                            Text("There are no bodies in the current scene")
+                                .padding(.bottom)
+                                .multilineTextAlignment(.center)
+                        }
+                        
+                        HStack {
+                            Button("Restart", action: {
+                                solarscene.pauseLoop()
+                                solarscene = SolarScene(
+                                    focusOnBody: startingFocusOnBody, focusIndex: startingFocusIndex, trails: startingShowTrails, velocityArrows: startingShowVelocityArrows, gravitationalConstant: startingGravitationalConstant, inputBodies: startingBodies, allowCameraControl: true
+                                )
+                                isSettingsPresented = false
+                                playing = false
+                            })
+                            .padding(.trailing)
+                            
+                            Divider()
+                                .frame(height: 20)
+                            
+                            Button(availableBodies.count > 0 ? "Confirm" : "Dismiss", action: {
+                                solarscene.pauseLoop()
+                                solarscene = SolarScene(
+                                    focusOnBody: focusOnBody, focusIndex: availableBodies.firstIndex(of: selectedBody) ?? 0, trails: showTrails, velocityArrows: showVelocityArrows, gravitationalConstant: gravitationalConstant, inputBodies: solarscene.inputBodies, allowCameraControl: true
+                                )
+                                isSettingsPresented = false
+                                playing = false
+                            })
+                            .padding(.leading)
+                        }
+                        .padding(.bottom)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
+                
+                // Delete All Button Slideover
+                .slideOverCard(isPresented: $isDeletePresented) {
+                    VStack {
+                        Text("Delete All Bodies:")
+                            .fontWeight(.bold)
+                            .font(.title)
+                        
+                        Text("Are you sure you'd like to clear the scene?")
+                            .padding(10)
+                            .multilineTextAlignment(.center)
+                        
+                        Button("Yes", action: {
+                            solarscene.pauseLoop()
+                            focusOnBody = false
+                            availableBodies = []
+                            solarscene = SolarScene(
+                                focusOnBody: false, focusIndex: 0, trails: showTrails, velocityArrows: showVelocityArrows, gravitationalConstant: gravitationalConstant, inputBodies: [], allowCameraControl: true
+                            )
+                            isDeletePresented = false
+                            playing = false
+                        })
+                        .padding(.bottom)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
+                
+            }
+        }
+    }
+}
+
