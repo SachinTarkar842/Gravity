@@ -1,9 +1,4 @@
-//
-//  File 2.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
+
 
 import SwiftUI
 
@@ -55,4 +50,3 @@ extension View {
         })
     }
 }
-

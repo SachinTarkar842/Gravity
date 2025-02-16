@@ -1,3 +1,5 @@
+
+
 import Foundation
 import SwiftUI
 import SceneKit
@@ -23,34 +25,38 @@ struct ContentView: View {
         VStack {
             if showInitial {
                 Group {
-                    HStack {
+                    HStack(alignment: .center, spacing: 8) {
                         if showLogo == 1 {
                             Image("orbit-logo")
-                                .onAppear() {
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100) // adjust size as needed
+                                .cornerRadius(25)
+                                // Remove extra padding if spacing is set in HStack
+                                .onAppear {
                                     withAnimation(.easeInOut.delay(1)) {
                                         showContinue = true
                                     }
                                 }
-                                .padding(.trailing)
                         }
-
-                        Text("Orbit")
+                        
+                        Text("Gravity")
                             .font(.system(size: 80))
                             .opacity(orbitOpacity)
                             .scaleEffect(scale)
-                            .onAppear() {
+                            .onAppear {
                                 withAnimation(.easeOut(duration: 1.5).delay(1)) {
                                     scale = 1
                                     orbitOpacity = 1
                                 }
                             }
-                            .padding(.bottom)
                             .onAnimationCompleted(for: scale) {
                                 withAnimation(.easeIn) {
                                     showLogo = 1
                                 }
                             }
                     }
+                    .padding(.bottom)
 
                     if showContinue {
                         Button("Continue") {
@@ -122,6 +128,7 @@ struct InfoView: View {
                 Spacer()
                     .frame(height: 50)
                 
+                
                 Text("Newton's Universal Law of Gravitation")
                     .font(.title)
                     .multilineTextAlignment(.center)
@@ -142,19 +149,13 @@ struct InfoView: View {
                     .multilineTextAlignment(.center)
                     .padding(15)
                 
-                Text("🤖")
-                    .font(.system(size: 120))
-                    .offset(
-                        x: -(UIScreen.main.bounds.size.width/2 - 95),
-                        y: (UIScreen.main.bounds.size.height/2 - 170)
-                    )
+                
                 
                 Button("Now Let's Play!") {
                     withAnimation(.spring()) {
                         showSimulation = true
                     }
                 }
-                .buttonStyle(BorderedButtonStyle())
             }
         }
     }

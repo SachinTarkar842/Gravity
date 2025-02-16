@@ -1,9 +1,3 @@
-//
-//  Accessories.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
 
 import SwiftUI
 
@@ -37,4 +31,3 @@ public struct SOCManager {
         }
     }
 }
-

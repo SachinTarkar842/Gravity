@@ -1,9 +1,4 @@
-//
-//  File 2.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
+
 
 import SwiftUI
 import SceneKit
@@ -222,8 +217,8 @@ class SolarScene {
             trail.birthRate = 10000
             trail.particleSize = 0.1
             trail.particleColor = bodyStruct?.color.withAlphaComponent(0.1) ?? UIColor(.blue)
-            trail.emitterShape = SCNSphere(radius: 0.4)
-            trail.particleLifeSpan = 0.5
+            trail.emitterShape = SCNSphere(radius: 0.2)
+            trail.particleLifeSpan = 5
             trail.particleLifeSpanVariation = 1.0
             body.addParticleSystem(trail)
         }
@@ -252,4 +247,3 @@ class SolarScene {
         }
     }
 }
-

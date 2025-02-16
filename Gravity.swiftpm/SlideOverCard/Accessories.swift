@@ -1,9 +1,3 @@
-//
-//  File.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
 
 import SwiftUI
 
@@ -72,4 +66,3 @@ struct Acessories_Previews: PreviewProvider {
         }.previewLayout(.sizeThatFits)
     }
 }
-

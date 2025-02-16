@@ -1,9 +1,3 @@
-//
-//  File 4.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
 
 import SwiftUI
 
@@ -41,4 +35,3 @@ public struct SlideOverCardView<Content: View>: View {
         })
     }
 }
-

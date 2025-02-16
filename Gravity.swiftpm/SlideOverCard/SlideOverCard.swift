@@ -1,9 +1,3 @@
-//
-//  File 3.swift
-//  Gravity
-//
-//  Created by IOS on 16/02/25.
-//
 
 import SwiftUI
 
@@ -191,4 +185,3 @@ struct SlideOverCard_Previews: PreviewProvider {
         }
     }
 }
-
