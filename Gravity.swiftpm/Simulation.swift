@@ -42,14 +42,7 @@ struct Simulation: View {
     @State private var selectedBodyPositionY: String = ""
     @State private var selectedBodyPositionZ: String = ""
     
-    @State private var massRangeLower: String = "1.00"
-    @State private var massRangeUpper: String = "20.00"
-    @State private var positionRangeLower: String = "-70.00"
-    @State private var positionRangeUpper: String = "70.00"
-    @State private var velocityRangeLower: String = "-0.80"
-    @State private var velocityRangeUpper: String = "0.80"
-    @State private var bodynumRangeLower: String = "3"
-    @State private var bodynumRangeUpper: String = "9"
+   
     
     
     
@@ -517,23 +510,19 @@ struct Simulation: View {
                                 Divider()
                                     .padding(.top)
                                 
-                                HStack {
-                                    Text("Gravitational Constant:")
-                                        .multilineTextAlignment(.center)
-                                    
-                                    let formatter: NumberFormatter = {
-                                        let formatter = NumberFormatter()
-                                        formatter.numberStyle = .decimal
-                                        return formatter
-                                    }()
-                                    
-                                    TextField("Enter a Gravitational Constant", value: $gravitationalConstant, formatter: formatter)
-                                        .textFieldStyle(.roundedBorder)
-                                        .keyboardType(.decimalPad)
-                                        .padding()
-                                        .multilineTextAlignment(.center)
-                                }
-                                
+                                VStack {
+                                            // Display Current Gravitational Constant
+                                            Text("Gravitational Constant: \(gravitationalConstant, specifier: "%.2f")")
+                                                .font(.headline)
+                                                .padding()
+                                            
+                                            // Slider for Adjusting G
+                                            Slider(value: $gravitationalConstant, in: 0.1...10.0, step: 0.1)
+                                                .padding()
+                                            
+                                            
+                                        }
+                            
                                 Divider()
                                     .padding(.bottom)
                                 

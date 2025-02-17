@@ -104,8 +104,8 @@ struct SimulationView: View {
             startingBodies: [
                 BodyDefiner(name: "Sun", mass: 20.0, velocity: SCNVector3(0, 0, 0), position: SCNVector3(0, 0, 0), color: UIColor.systemYellow),
                 BodyDefiner(name: "Earth", mass: 6.0, velocity: SCNVector3(-0.65, 0, 0), position: SCNVector3(0, -70, 0), color: UIColor.systemGreen),
-                BodyDefiner(name: "Moon", mass: 1, velocity: SCNVector3(0, 0, 0.025), position: SCNVector3(0, -85, 0), color: UIColor.systemBlue),
-                BodyDefiner(name: "Mars", mass: 5.0, velocity: SCNVector3(0.4, 0, 0), position: SCNVector3(0, -150, 0), color: UIColor.systemRed),
+//                BodyDefiner(name: "Moon", mass: 1, velocity: SCNVector3(0, 0, 0.025), position: SCNVector3(0, -85, 0), color: UIColor.systemBlue),
+//                BodyDefiner(name: "Mars", mass: 5.0, velocity: SCNVector3(0.4, 0, 0), position: SCNVector3(0, -150, 0), color: UIColor.systemRed),
             ],
             showUI: true,
             allowCameraControl: true,
