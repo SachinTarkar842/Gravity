@@ -218,7 +218,7 @@ class SolarScene {
             trail.particleSize = 0.1
             trail.particleColor = bodyStruct?.color.withAlphaComponent(0.1) ?? UIColor(.blue)
             trail.emitterShape = SCNSphere(radius: 0.2)
-            trail.particleLifeSpan = 5
+            trail.particleLifeSpan = 3
             trail.particleLifeSpanVariation = 1.0
             body.addParticleSystem(trail)
         }
