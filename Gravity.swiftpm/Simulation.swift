@@ -2,7 +2,7 @@
 import SwiftUI
 import SceneKit
 import Foundation
-import Combine
+//import Combine
 
 
 struct Simulation: View {
