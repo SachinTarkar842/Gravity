@@ -16,8 +16,8 @@ let package = Package(
         .iOSApplication(
             name: "Gravity",
             targets: ["AppModule"],
-            bundleIdentifier: "com.garv.Swift-Student-Challenge-2022",
-            teamIdentifier: "J55VMN7UVW",
+            bundleIdentifier: "gravity.com",
+            teamIdentifier: "PC43V2F4N4",
             displayVersion: "1.1",
             bundleVersion: "5",
             iconAssetName: "AppIcon",
@@ -31,9 +31,6 @@ let package = Package(
                 .landscapeRight,
                 .landscapeLeft,
                 .portraitUpsideDown(.when(deviceFamilies: [.pad]))
-            ],
-            capabilities: [
-                .camera(purposeString: "To allow Orbit to use ARKit and create an AR scene")
             ]
         )
     ],
