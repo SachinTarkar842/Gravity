@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 import SceneKit
 import Foundation
@@ -21,6 +19,7 @@ class SolarScene {
     var cameraTransform: SCNVector3 = SCNVector3(0, 0, 0)
     var showTexture: Bool = true
     
+    
     struct CelestialBody {
         var internalName: String
         var mass: CGFloat
@@ -34,7 +33,7 @@ class SolarScene {
         let gravitationalConstant: CGFloat
         var velocityArrow: SCNNode? = nil
         let velocityArrows: Bool
-        
+        var nameLabel: SCNNode? // Add a label to display the name
         
         mutating func initial() {
             currentVelocity = initialVelocity
@@ -51,19 +50,36 @@ class SolarScene {
             body.name = "planet_" + internalName + "_" + "\(mass)"
             body.position = initialPosition
             
-            if internalName == "Sun" {
-                body.filters = addBloom()
-            }
+//            // Apply the bloom filter only to the Sun body (not the name)
+//            if internalName == "Sun" {
+//                body.filters = addBloom() // Keep the bloom filter on the Sun body
+//            }
             
             planetBody = body
+            
+            // Add a name label above the planet
+            let textGeometry = SCNText(string: internalName, extrusionDepth: 1)
+            textGeometry.font = UIFont.systemFont(ofSize: 8)
+            textGeometry.firstMaterial?.diffuse.contents = UIColor.white
+            
+            nameLabel = SCNNode(geometry: textGeometry)
+            nameLabel?.position = SCNVector3(0, radius + 5, 0) // Position above the planet
+            
+            // Apply a billboard constraint to make the name label always face the camera
+            let billboardConstraint = SCNBillboardConstraint()
+            nameLabel?.constraints = [billboardConstraint]
+            
+            planetBody?.addChildNode(nameLabel!) // Add name label as a child of the planet node
             
             if self.velocityArrows {
                 let normalised = currentVelocity?.normalized ?? SCNVector3(0, 0, 0)
                 velocityArrow = lineBetweenNodes(positionA: (returnPosition(timeStep: 1) + currentVelocity! * 6) + (normalised * radius), positionB: returnPosition(timeStep: 1), inScene: internalScene, parentPosition: body.position)
                 body.addChildNode(velocityArrow!)
             }
+            
             internalScene.rootNode.addChildNode(body)
         }
+
         
         mutating func updateVelocity(timeStep: Double) {
             for otherBody in internalScene.rootNode.childNodes(passingTest: {
@@ -81,6 +97,9 @@ class SolarScene {
         
         mutating func updatePosition(timeStep: Double, focusBody: CelestialBody? = nil) {
             self.planetBody!.position = self.planetBody!.position + (currentVelocity! * timeStep) - (focusBody?.returnPosition(timeStep: timeStep) ?? SCNVector3(0, 0, 0)) + (focusBody?.initialPosition ?? SCNVector3(0, 0, 0))
+            
+            // Keep the name label above the planet as it moves
+            nameLabel?.position = SCNVector3(0, radius + 5, 0) // Maintain relative position above the planet
         }
         
         func returnPosition(timeStep: Double) -> SCNVector3 {
