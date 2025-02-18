@@ -25,7 +25,9 @@ struct Simulation: View {
     @State private var isAddPresented: Bool = false
     @State private var isSettingsPresented: Bool = false
     @State private var isDeletePresented: Bool = false
+    @State private var isRestartPresent: Bool = false
     @State private var isHelpActive: Bool = false
+    @State private var isExploreActive: Bool = false
     @State private var isAvailable: Bool = false
     @State var showSheet: Bool = false
     
@@ -109,12 +111,25 @@ struct Simulation: View {
                 }.sheet(isPresented: $isHelpActive) {
                     HelpView()
                 }
+                // explore button
+                .floatingActionButton(color: .clear, image: Image(systemName: "scope").foregroundColor(.white), align: ButtonAlign.right, customY: -20, customX: -30, top: true) {
+                    isExploreActive.toggle()
+                    
+                }.fullScreenCover(isPresented: $isExploreActive) {
+//                    ExploreView()
+                    GravityGameView()
+                        
+                }
                 
                 // delete all button
                 .floatingActionButton(color: .accentColor, image: Image(systemName: "trash").foregroundColor(.white), align: ButtonAlign.right) {
                     isDeletePresented.toggle()
                 }
                 
+                // restart button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "arrow.clockwise").foregroundColor(.white), align: ButtonAlign.left) {
+                    isRestartPresent.toggle()
+                }
                 
                 
                 // play and pause button
@@ -449,7 +464,7 @@ struct Simulation: View {
             
                     
                     // Settings Button Slideover
-                    .slideOverCard(isPresented: $isSettingsPresented) {
+                    .sheet(isPresented: $isSettingsPresented) {
                         VStack {
                             Text("Settings:")
                                 .fontWeight(.bold)
@@ -533,18 +548,6 @@ struct Simulation: View {
                             }
                             
                             HStack {
-                                Button("Restart", action: {
-                                    solarscene.pauseLoop()
-                                    solarscene = SolarScene(
-                                        focusOnBody: startingFocusOnBody, focusIndex: startingFocusIndex, trails: startingShowTrails, velocityArrows: startingShowVelocityArrows, gravitationalConstant: startingGravitationalConstant, inputBodies: startingBodies, allowCameraControl: true
-                                    )
-                                    isSettingsPresented = false
-                                    playing = false
-                                })
-                                .padding(.trailing)
-                                
-                                Divider()
-                                    .frame(height: 20)
                                 
                                 Button(availableBodies.count > 0 ? "Confirm" : "Dismiss", action: {
                                     solarscene.pauseLoop()
@@ -587,7 +590,30 @@ struct Simulation: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    
+                
+                // restart button
+                    .slideOverCard(isPresented: $isRestartPresent) {
+                        VStack {
+                            Text("Restart:")
+                                .fontWeight(.bold)
+                                .font(.title)
+                            
+                            Text("Are you sure you'd like to restart the scene?")
+                                .padding(10)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("Yes", action: {
+                                solarscene.pauseLoop()
+                                solarscene = SolarScene(
+                                    focusOnBody: startingFocusOnBody, focusIndex: startingFocusIndex, trails: startingShowTrails, velocityArrows: startingShowVelocityArrows, gravitationalConstant: startingGravitationalConstant, inputBodies: startingBodies, allowCameraControl: true
+                                )
+                                playing = false
+                                isRestartPresent = false
+                            })
+                            .padding(.bottom)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
             }
         }
