@@ -137,17 +137,18 @@ struct InfoView: View {
                     .colorInvert()
                     .padding(30)
                 
-                Text("Newton's Universal Law of Gravition is a rule that predicts the movement of bodies by stating that every object in the universe excerts some gravitational force on every other object nearby it. This is predicted by the equation above.")
+                Text("Newton's Universal Law of Gravitation explains how objects in the universe interact by stating that every object exerts a gravitational force on every other nearby object. This relationship is described by the equation above.")
                     .multilineTextAlignment(.center)
                     .padding(15)
-                
-                Text("So what does the rule mean? Well, why does the Moon stay close to the Earth and not just fly into the Sun? Why do we stay on the Earth and not just fly off? Because both the moon and us are within the Earth's gravitional field, and the mass of the Earth is big enough to keep us both attracted.")
+
+                Text("But what does this really mean? Why does the Moon orbit the Earth instead of drifting off into space? Why do we stay on the ground rather than floating away? It's because both the Moon and we are within Earth's gravitational field, and the Earth's mass is large enough to keep us pulled toward it.")
                     .multilineTextAlignment(.center)
                     .padding(15)
-                
-                Text("So why does the moon not fall into the earth then? Well think of it like this: if I throw a ball, it will eventually hit the ground. If I throw the ball further, it will hit the ground further. But if I throw the ball so strong that it never hits the ground, the ball would be in **orbit**. Like this, the moon is actually always falling towards the Earth, but the Earth just moves away too fast!")
+
+                Text("So why doesn’t the Moon crash into the Earth? Imagine throwing a ball—it eventually falls to the ground. If you throw it farther, it lands farther. But if you throw it fast enough, it will keep moving forward without ever hitting the ground, essentially entering **orbit**. In the same way, the Moon is constantly falling toward Earth, but Earth's curvature ensures it never actually collides!")
                     .multilineTextAlignment(.center)
                     .padding(15)
+
                 
                 
                 
