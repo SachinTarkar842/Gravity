@@ -31,8 +31,9 @@ struct GravityGameView: View {
             
             // Scene View
             SceneView(scene: scene, options: [.allowsCameraControl])
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: UIScreen.main.bounds.height * 0.66)
                 .background(Color.black)
+
             
             Text("Fall Time: \(fallTime)")
                 .font(.title2)
@@ -86,17 +87,14 @@ struct GravityGameView: View {
                 // Drop button
                 Button(action: {
                     if let gravity = planets[selectedPlanet] {
-                        fallTime = "-- sec"
-                        
-                        
-                        // Calculate fall time using the formula t = sqrt(2h/g)
-                        let calculatedTime = sqrt((2 * objectHeight) / gravity)
-                        
+                        fallTime = "-- sec"  // ✅ Reset fall time before dropping
+
                         scene.dropObject(gravity: gravity) { time in
-                            fallTime = String(calculatedTime) + " sec"
+                            DispatchQueue.main.async {
+                                fallTime = String(format: "%.2f", time) + " sec"  // ✅ Update UI after collision
+                            }
                         }
                     }
-
                 }) {
                     Text("Drop Object")
                         .font(.title2)
@@ -106,6 +104,9 @@ struct GravityGameView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+
+
+
                 .padding()
             }
             .padding()
