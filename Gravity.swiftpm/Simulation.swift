@@ -2,7 +2,6 @@
 import SwiftUI
 import SceneKit
 import Foundation
-//import Combine
 
 
 struct Simulation: View {
@@ -27,7 +26,7 @@ struct Simulation: View {
     @State private var isDeletePresented: Bool = false
     @State private var isRestartPresent: Bool = false
     @State private var isHelpActive: Bool = false
-    @State private var isExploreActive: Bool = false
+    @State private var isGameActive: Bool = false
     @State private var isAvailable: Bool = false
     @State var showSheet: Bool = false
     
@@ -111,15 +110,7 @@ struct Simulation: View {
                 }.sheet(isPresented: $isHelpActive) {
                     HelpView()
                 }
-                // explore button
-                .floatingActionButton(color: .clear, image: Image(systemName: "scope").foregroundColor(.white), align: ButtonAlign.right, customY: -20, customX: -30, top: true) {
-                    isExploreActive.toggle()
-                    
-                }.fullScreenCover(isPresented: $isExploreActive) {
-//                    ExploreView()
-                    GravityGameView()
-                        
-                }
+               
                 
                 // delete all button
                 .floatingActionButton(color: .accentColor, image: Image(systemName: "trash").foregroundColor(.white), align: ButtonAlign.right) {
@@ -127,7 +118,7 @@ struct Simulation: View {
                 }
                 
                 // restart button
-                .floatingActionButton(color: .accentColor, image: Image(systemName: "arrow.clockwise").foregroundColor(.white), align: ButtonAlign.left) {
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "arrow.clockwise").foregroundColor(.white), align: ButtonAlign.center, customX: -160) {
                     isRestartPresent.toggle()
                 }
                 
@@ -161,6 +152,14 @@ struct Simulation: View {
                     isSettingsPresented.toggle()
                 }
                 
+                // gravity game
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "scope").foregroundColor(.white), align: ButtonAlign.centre, customX: 160) {
+                    isGameActive.toggle()
+                }.fullScreenCover(isPresented: $isGameActive) {
+                    GravityGameView()
+                        
+                }
+                
                 
                 // edit button
                 .floatingActionButton(color: .accentColor, image: Image(systemName: "pencil").foregroundColor(.white), align: ButtonAlign.centre, customX: 80) {
@@ -187,6 +186,7 @@ struct Simulation: View {
                     
                     isEditPresented.toggle()
                 }
+                
                 
                 // Edit Button Slideover
                 .slideOverCard(isPresented: $isEditPresented) {
