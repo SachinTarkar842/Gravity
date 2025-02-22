@@ -34,7 +34,6 @@ struct GravityGameView: View {
                 .frame(maxWidth: .infinity, maxHeight: UIScreen.main.bounds.height * 0.66)
                 .background(Color.black)
 
-            
             Text("Fall Time: \(fallTime)")
                 .font(.title2)
                 .bold()
@@ -51,13 +50,7 @@ struct GravityGameView: View {
                 .pickerStyle(WheelPickerStyle())
                 .frame(height: 100)
                 
-                // Mass Slider
-                HStack {
-                    Text("Mass:")
-                    Slider(value: $objectMass, in: 0.5...5, step: 0.1)
-                    Text("\(objectMass, specifier: "%.1f") kg")
-                }
-                .padding()
+
                 
                 // Height Slider
                 HStack {
@@ -67,7 +60,7 @@ struct GravityGameView: View {
                 }
                 .padding()
                 
-                // confirm
+                // Confirm button
                 Button(action: {
                     if let gravity = planets[selectedPlanet] {
                         fallTime = "-- sec"  // Reset Fall Time
@@ -87,11 +80,11 @@ struct GravityGameView: View {
                 // Drop button
                 Button(action: {
                     if let gravity = planets[selectedPlanet] {
-                        fallTime = "-- sec"  // ✅ Reset fall time before dropping
+                        fallTime = "-- sec"  // Reset fall time before dropping
 
-                        scene.dropObject(gravity: gravity) { time in
+                        scene.dropObject(height: objectHeight, gravity: gravity) { time in
                             DispatchQueue.main.async {
-                                fallTime = String(format: "%.2f", time) + " sec"  // ✅ Update UI after collision
+                                fallTime = String(format: "%.2f", time) + " sec"  // Update UI after collision
                             }
                         }
                     }
@@ -104,9 +97,6 @@ struct GravityGameView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-
-
-
                 .padding()
             }
             .padding()
