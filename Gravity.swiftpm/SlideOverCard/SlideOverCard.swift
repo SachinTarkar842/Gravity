@@ -107,7 +107,7 @@ public struct SlideOverCard<Content: View>: View {
     }
 }
 
-public struct SOCOptions: OptionSet {
+public struct SOCOptions: OptionSet, Sendable {
     public let rawValue: Int8
     
     public init(rawValue: Int8) {

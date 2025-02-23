@@ -49,17 +49,19 @@ class GravityScene: SCNScene, SCNPhysicsContactDelegate {
     }
     
     /// Drop object and calculate fall time based on physics formula: t = sqrt(2h/g)
+    @MainActor
     func dropObject(height: Double, gravity: CGFloat, completion: @escaping (Double) -> Void) {
         let fallTime = sqrt((2 * height) / Double(gravity))  // Using physics formula
         fallTimeCallback = completion
         ballNode.physicsBody?.isAffectedByGravity = true
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + fallTime) {
-            
             self.ballNode.physicsBody?.velocity = SCNVector3(0, 0, 0)
             self.ballNode.physicsBody?.angularVelocity = SCNVector4(0, 0, 0, 0)
             self.ballNode.physicsBody?.isAffectedByGravity = false
             self.fallTimeCallback?(fallTime)
         }
     }
+
+
 }
