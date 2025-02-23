@@ -111,11 +111,14 @@ struct Simulation: View {
                 }.sheet(isPresented: $isHelpActive) {
                     HelpView()
                 }
-                // explore button
-                .floatingActionButton(color: .clear, image: Image(systemName: "scope").foregroundColor(.white), align: ButtonAlign.right, customY: -20, customX: -30, top: true) {
-                    isExploreActive.toggle()
+                
+                // Gravity Game button
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "scope").foregroundColor(.white), align: ButtonAlign.centre, customX: 120) {
                     
-                }.fullScreenCover(isPresented: $isExploreActive) {
+                    isExploreActive.toggle()
+                }
+
+               .fullScreenCover(isPresented: $isExploreActive) {
 //                    ExploreView()
                     GravityGameView()
                         
@@ -133,7 +136,7 @@ struct Simulation: View {
                 
                 
                 // play and pause button
-                .floatingActionButton(color: .accentColor, image: Image(systemName: playing ? "pause.fill" : "play.fill").foregroundColor(.white), align: ButtonAlign.centre) {
+                .floatingActionButton(color: .accentColor, image: Image(systemName: playing ? "pause.fill" : "play.fill").foregroundColor(.white), align: ButtonAlign.centre, customX: -40) {
                     if solarscene.bodies.count > 0 {
                         if solarscene.counter == 0 {
                             solarscene.startLoop()
@@ -145,7 +148,7 @@ struct Simulation: View {
                 }
                 
                 // settings button
-                .floatingActionButton(color: .accentColor, image: Image(systemName: "gear").foregroundColor(.white), align: ButtonAlign.centre, customX: -80) {
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "gear").foregroundColor(.white), align: ButtonAlign.centre, customX: -120) {
                     availableBodies = solarscene.bodies.map({ (body) in
                         return body.internalName
                     })
@@ -163,7 +166,7 @@ struct Simulation: View {
                 
                 
                 // edit button
-                .floatingActionButton(color: .accentColor, image: Image(systemName: "pencil").foregroundColor(.white), align: ButtonAlign.centre, customX: 80) {
+                .floatingActionButton(color: .accentColor, image: Image(systemName: "pencil").foregroundColor(.white), align: ButtonAlign.centre, customX: 40) {
                     
                     availableBodies = solarscene.bodies.map({ (body) in
                         

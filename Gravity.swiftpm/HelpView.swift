@@ -92,6 +92,32 @@ struct HelpView: View {
                 .padding(20)
                 
                 HStack {
+                    Image(systemName: "scope").foregroundColor(.white)
+                        .imageScale(.large)
+                        .frame(width: 60, height: 60)
+                        .background(Circle().fill(Color.accentColor))
+                    
+                    Spacer()
+                        .frame(width: 30)
+                    
+                    Text("This is the Gravity Game button, where you can drop objects from different heights on various planets to observe their fall time. Experiment with gravity by adjusting mass and height to see how objects behave in different planetary environments.")
+                }
+                .padding(20)
+                
+                HStack {
+                    Image(systemName: "arrow.clockwise").foregroundColor(.white)
+                        .imageScale(.large)
+                        .frame(width: 60, height: 60)
+                        .background(Circle().fill(Color.accentColor))
+                    
+                    Spacer()
+                        .frame(width: 30)
+                    
+                    Text("This is the Restart Scene button, which resets the simulation to its initial state. Use it to start fresh and test different gravity scenarios without any previous objects or settings affecting the scene.")
+                }
+                .padding(20)
+                
+                HStack {
                     Image(systemName: "trash").foregroundColor(.white)
                         .imageScale(.large)
                         .frame(width: 60, height: 60)
