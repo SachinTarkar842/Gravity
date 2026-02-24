@@ -1,1 +1,1 @@
-Garavity
+Gravity
